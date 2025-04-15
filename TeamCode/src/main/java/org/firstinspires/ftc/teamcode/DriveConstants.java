@@ -13,5 +13,7 @@ public class DriveConstants {
     public static final double KP = 0.001; // Proportional constant for PID controller
     public static final double KI = 0.001; // Integral constant for PID controller
     public static final double KD = 0.001; // Derivative constant for PID controller
-    public static final double TOTAL_WEIGHT = 0; //In kilograms
+    public static final double ROBOT_MASS = 0; //In kilograms
+    public static final double ROBOT_LENGHT = 0;//In centimeters
+    public static final double ROBOT_WIDTH = 0;//In centimeters
 }
