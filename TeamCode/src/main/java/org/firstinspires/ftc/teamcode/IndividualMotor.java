@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
 public class IndividualMotor (String motorname){
-    Motor motor = New;
-
 
 }
