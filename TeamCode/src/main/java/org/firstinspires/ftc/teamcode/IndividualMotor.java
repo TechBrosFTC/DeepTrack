@@ -1,5 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-public class IndividualMotor (String motorname){
+public class IndividualMotor {
 
 }
