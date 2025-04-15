@@ -1,4 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
-public class IndividualMotor {
+public class IndividualMotor (String motorname){
+    Motor motor = New;
+
+
 }
