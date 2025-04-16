@@ -1,10 +1,7 @@
-package org.firstinspires.ftc.teamcode;
-
-import java.util.Vector;
+package org.firstinspires.ftc.teamcode.deeptrack;
 
 public class Localizer {
     public double[] position = {0, 0, 0};// x, y, heading
-
     private int quadrant(){//returns the quadrant of the robot in the arena. We've divided the Into the Deep Arena into 8 quadrants
         int actualQuadrant = 0;
         if (position[0] <= 180 && !(position[1]>120 && position[1]<240)){
@@ -32,5 +29,11 @@ public class Localizer {
         }
         return actualQuadrant;
     }
+    public void updatePosition(double x, double y, double heading){
+        position[0] = x;
+        position[1] = y;
+        position[2] = heading;
+    }
+
 
 }
