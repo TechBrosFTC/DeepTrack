@@ -1,21 +1,22 @@
 package org.firstinspires.ftc.teamcode.deeptrack;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
 public class TwoWheelOdometry {
     private String instance_name_x;
     private String instance_name_y;
     private boolean revt_x;
     private boolean revt_y;
-    public DcMotor x;
-    public DcMotor y;
-    public TwoWheelOdometry(String inst_name_x, String inst_name_y, boolean revertx, boolean reverty) {
-        this.instance_name_x = inst_name_x;
-        this.instance_name_y = inst_name_y;
+    private DcMotor x;
+    private DcMotor y;
+    public TwoWheelOdometry(HardwareMap hardwareMap, boolean revertx, boolean reverty) {
         this.revt_x = revertx;
         this.revt_y = reverty;
-        x = hardwareMap.get(DcMotor.class, inst_name_x);
-        y = hardwareMap.get(DcMotor.class, inst_name_y);
+        this.x = hardwareMap.get(DcMotor.class, "perp");
+        this.y = hardwareMap.get(DcMotor.class, "par");
         if(revt_x == true){
             x.setDirection(DcMotor.Direction.REVERSE);
         }
