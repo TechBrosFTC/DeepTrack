@@ -4,7 +4,7 @@ public  class PIDController {
     double kp;
     double kd;
     double ki;
-    double  prevError;
+    double prevError;
     double error;
     double integral;
     double proportional;
