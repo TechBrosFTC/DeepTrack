@@ -5,6 +5,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+/**
+ *This is the class for robots with only two odometry wheels. This kind of track also needs
+ * a IMU sensor, built in or external. There are methods for localization of the robot.
+ *@author Gabriel Borges
+ */
 public class TwoWheelOdometry {
     private String instance_name_x;
     private String instance_name_y;
