@@ -11,10 +11,12 @@ public class teste extends LinearOpMode{
     DcMotorSimple esquerdaFrente = hardwareMap.get(DcMotorSimple.class, "motor3");
     DcMotorSimple esquerdaTras = hardwareMap.get(DcMotorSimple.class, "motor4");
    // MecanumDrive mecanumDrive = new MecanumDrive(0, 0, 0, direitaFrente, direitaTras, esquerdaFrente, esquerdaTras, 0, 0, 0);
+    public RobotSetup peach = new RobotSetup(hardwareMap);
 
     public void runOpMode(){
         waitForStart();
         while(opModeIsActive()){
+
         }
     }
 }
