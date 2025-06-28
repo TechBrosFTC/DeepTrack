@@ -25,7 +25,7 @@ public class RobotSetup {
     public RobotSetup(HardwareMap hardwareMap) {
         /*
         odometry = new TwoWheelOdometry(hardwareMap,false, false);
-        odometry = new ThreeWheelOdometry(hardwareMap,true, false);
+        odometry = new ThreeWheelOdometry(hardwareMap,false, false, false);
         odometry = false;
         */
     }
@@ -33,5 +33,4 @@ public class RobotSetup {
     RevHubOrientationOnRobot orientation = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP, RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD);
     public InertialMeasurementUnit imu = new InertialMeasurementUnit(orientation, hardwareMap, "imu");
     public MecanumDrive mecanumDrive = new MecanumDrive(0, 0, 0, driveTrain, 0, 0, 0, imu);
-
 }

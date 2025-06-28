@@ -4,7 +4,7 @@ public class DriveConstants {
     /**Constants for drive calculations
      We decided to use the SI system for consistency. @author Gabriel Borges */
     public static final double WHEEL_DIAMETER = 0; // in centimeters
-    public static final double TRACK_WIDTH = 0; // in centimeters
+    public static final double TRACK_WIDTH = 0; // distance between the odometry wheels in centimeters
     public static final double MOTOR_TICKS_PER_REV = 1; // You can find this data in the specifications of your motor
     public static final double GEAR_RATIO =  1/15; //Some motor have a built-in gear ratio that you need to take into account, you can find this data in the specifications of your motor
     public static final double MOTOR_MAX_RPM = 1; // You can find this data in the specifications of your motor
@@ -16,5 +16,4 @@ public class DriveConstants {
     public static final double ROBOT_MASS = 0; //In kilograms
     public static final double ROBOT_LENGHT = 0;//In centimeters
     public static final double ROBOT_WIDTH = 0;//In centimeters
-
 }
