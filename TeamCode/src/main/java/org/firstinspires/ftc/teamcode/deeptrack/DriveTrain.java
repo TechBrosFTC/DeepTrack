@@ -13,4 +13,22 @@ public class DriveTrain {
         this.rightFront = rightFront;
         this.rightBack = rightBack;
     }
+    public void drive(double power, double steering){//positive power = forward, negative power = backward, positive steering = right, negative steering = left
+        leftFront.setPower(power + steering);
+        leftBack.setPower(power + steering);
+        rightFront.setPower(power - steering);
+        rightBack.setPower(power - steering);
+    }
+    public void turn(double power){//positive = right, negative = left
+        leftFront.setPower(power);
+        leftBack.setPower(power);
+        rightFront.setPower(-power);
+        rightBack.setPower(-power);
+    }
+    public void stop() {
+        leftFront.setPower(0);
+        leftBack.setPower(0);
+        rightFront.setPower(0);
+        rightBack.setPower(0);
+    }
 }

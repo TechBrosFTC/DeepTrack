@@ -11,8 +11,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
  *@author Gabriel Borges
  */
 public class TwoWheelOdometry {
-    private String instance_name_x;
-    private String instance_name_y;
     private boolean revt_x;
     private boolean revt_y;
     private DcMotor x;
