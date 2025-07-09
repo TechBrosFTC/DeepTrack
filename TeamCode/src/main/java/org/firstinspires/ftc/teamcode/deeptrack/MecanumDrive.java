@@ -14,10 +14,10 @@ public class MecanumDrive {//Class mecanum drive
     private double kp;//pid constants
     private double kd;
     private double ki;
-    private PIDController pid;
+    private PIDController drivePID;
     private RevHubOrientationOnRobot orientation;//orientation of the robot
     public IMU imu;//Inertial measuremennt unit
-    public MecanumDrive(double initial_x, double initial_y, double initial_theta, DriveTrain driveTrain, double kp, double kd, double ki, InertialMeasurementUnit imu){
+    public MecanumDrive(double initial_x, double initial_y, double initial_theta, DriveTrain driveTrain, double kp, double kd, double ki, InertialMeasurementUnit imu, Odometry odometry){
         x = initial_x;
         y = initial_y;
         theta = initial_theta;
@@ -25,12 +25,19 @@ public class MecanumDrive {//Class mecanum drive
         this.kp = kp;
         this.kd = kd;
         this.ki = ki;
-        pid = new PIDController(kp, kd, ki);
+        drivePID = new PIDController(kp, kd, ki);
         this.imu = imu.imu;
+
     }
 
     public void turn(double target, double max_speed, double min_speed){
         
+    }
+    public void MRUVY(double min_speed, double max_speed, double distance, double theta_target){
+        int ticks = (int) (distance / DriveConstants.CM_PER_TICK);
+        double a = Math.abs(max_speed - min_speed)/ticks;
+        double b = Math.abs(min_speed);
+
     }
     private double getIMU(){
         return imu.getRobotYawPitchRollAngles().getYaw();
