@@ -8,7 +8,7 @@ public class Encoder {
     public Encoder(String encoder, boolean reverse, HardwareMap hardwareMap){
         this.encoder = hardwareMap.get(DcMotorEx.class, encoder);
         if(reverse){
-            encoder.setDirection(DcMotorEx.Direction.REVERSE);
+            this.encoder.setDirection(DcMotorEx.Direction.REVERSE);
         }
     }
     public double getEncoder(){

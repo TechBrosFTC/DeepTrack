@@ -7,8 +7,8 @@ import org.firstinspires.ftc.teamcode.RobotSetup;
 public class Telemetria extends LinearOpMode {
     @Override
     public void runOpMode() {
-        RobotSetup robot = new RobotSetup(hardwareMap);
-        while (opModeIsActive()) {
-        }
+//        RobotSetup robot = new RobotSetup(hardwareMap);
+//        while (opModeIsActive()) {
+//        }
     }
 }

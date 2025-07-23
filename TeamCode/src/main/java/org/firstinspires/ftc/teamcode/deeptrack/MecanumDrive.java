@@ -14,9 +14,18 @@ public class MecanumDrive {//Class mecanum drive
     private double kp;//pid constants
     private double kd;
     private double ki;
+    private double direction;
+    private double speed;
+    private double target;
+    private double proportional;
+    private double derivative;
+    private double integral;
+    private double previousError;
+    private double error;
     private PIDController drivePID;
     private RevHubOrientationOnRobot orientation;//orientation of the robot
-    public IMU imu;//Inertial measuremennt unit
+    public InertialMeasurementUnit imu;//Inertial measuremennt unit
+    public Odometry odometry;//Odometry
     public MecanumDrive(double initial_x, double initial_y, double initial_theta, DriveTrain driveTrain, double kp, double kd, double ki, InertialMeasurementUnit imu, Odometry odometry){
         x = initial_x;
         y = initial_y;
@@ -25,9 +34,9 @@ public class MecanumDrive {//Class mecanum drive
         this.kp = kp;
         this.kd = kd;
         this.ki = ki;
+        this.odometry = odometry;
         drivePID = new PIDController(kp, kd, ki);
-        this.imu = imu.imu;
-
+        this.imu = imu;
     }
 
     public void turn(double target, double max_speed, double min_speed){
@@ -37,11 +46,50 @@ public class MecanumDrive {//Class mecanum drive
         int ticks = (int) (distance / DriveConstants.CM_PER_TICK);
         double a = Math.abs(max_speed - min_speed)/ticks;
         double b = Math.abs(min_speed);
+        this.odometry.resetY();
+        if (min_speed > 0) {
+            while (this.odometry.getY() < ticks*0.7){
+                error = (target - this.imu.getYaw());
+                proportional = error*kp;
+                derivative = (error - previousError)*kd;
+                integral = error+ki;
+                previousError = error;
+                direction = proportional + derivative + integral;
+                driveTrain.drive(max_speed, derivative);
+            }
+            while (this.odometry.getY() < ticks){
+                error = (target - this.imu.getYaw());
+                proportional = error*kp;
+                derivative = (error - previousError)*kd;
+                integral = error+ki;
+                previousError = error;
+                direction = proportional + derivative + integral;
+                speed = a*(Math.abs(this.odometry.getY())-ticks) + b;
+                driveTrain.drive(speed, derivative);
+            }
+        }else{
+            while (this.odometry.getY() > -ticks*0.7) {
+                error = (this.imu.getYaw() - target);
+                proportional = error * kp;
+                derivative = (error - previousError) * kd;
+                integral = error + ki;
+                previousError = error;
+                direction = proportional + derivative + integral;
+                driveTrain.drive(max_speed, derivative);
+            }
+            while (this.odometry.getY() > -ticks) {
+                error = (this.imu.getYaw()- target);
+                proportional = error * kp;
+                derivative = (error - previousError) * kd;
+                integral = error + ki;
+                previousError = error;
+                direction = proportional + derivative + integral;
+                speed = a * (Math.abs(this.odometry.getY()) - ticks) + b;
+                driveTrain.drive(speed, derivative);
+            }
+        }
+    }
 
-    }
-    private double getIMU(){
-        return imu.getRobotYawPitchRollAngles().getYaw();
-    }
     public void update(double x, double y, double theta){
         this.x = x;
         this.y = y;
