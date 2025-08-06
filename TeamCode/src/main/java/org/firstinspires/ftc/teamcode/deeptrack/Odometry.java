@@ -12,7 +12,7 @@ public class Odometry {
     private DcMotorEx par1;
     private DcMotorEx par2;
     private DcMotorEx perp;
-    public Odometry(double initial_x, double initial_y, double initial_theta, DcMotorEx par1, DcMotorEx par2, DcMotorEx perp){
+    public Odometry(double initial_x, double initial_y, double initial_theta, DcMotorEx par1, DcMotorEx par2, DcMotorEx perp) {
         x = initial_x;
         y = initial_y;
         theta = initial_theta;

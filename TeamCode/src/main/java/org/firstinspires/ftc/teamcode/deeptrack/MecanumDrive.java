@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.deeptrack;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.teamcode.DriveConstants;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**This is the main class for movimentation. There are methods for movimentation on xy axis and turns,
 localization of the robot and the route calculation built-in in the functions*/
@@ -22,11 +22,11 @@ public class MecanumDrive {//Class mecanum drive
     private double integral;
     private double previousError;
     private double error;
-    private PIDController drivePID;
     private RevHubOrientationOnRobot orientation;//orientation of the robot
-    public InertialMeasurementUnit imu;//Inertial measuremennt unit
+    private double divisor = 100;
+    public IMU imu;//Inertial measuremennt unit
     public Odometry odometry;//Odometry
-    public MecanumDrive(double initial_x, double initial_y, double initial_theta, DriveTrain driveTrain, double kp, double kd, double ki, InertialMeasurementUnit imu, Odometry odometry){
+    public MecanumDrive(double initial_x, double initial_y, double initial_theta, DriveTrain driveTrain, double kp, double kd, double ki, IMU imu, Odometry odometry){
         x = initial_x;
         y = initial_y;
         theta = initial_theta;
@@ -35,7 +35,6 @@ public class MecanumDrive {//Class mecanum drive
         this.kd = kd;
         this.ki = ki;
         this.odometry = odometry;
-        drivePID = new PIDController(kp, kd, ki);
         this.imu = imu;
     }
 
@@ -44,56 +43,57 @@ public class MecanumDrive {//Class mecanum drive
     }
     public void MRUVY(double min_speed, double max_speed, double distance, double theta_target){
         int ticks = (int) (distance / DriveConstants.CM_PER_TICK);
-        double a = Math.abs(max_speed - min_speed)/ticks;
+        double a = Math.abs(max_speed - min_speed)/(ticks*0.3);
         double b = Math.abs(min_speed);
-        this.odometry.resetY();
+        odometry.resetY();
         if (min_speed > 0) {
-            while (this.odometry.getY() < ticks*0.7){
-                error = (target - this.imu.getYaw());
+            while (odometry.getY() < ticks*0.7){
+                error = (target - imu.getRobotYawPitchRollAngles().getYaw());
                 proportional = error*kp;
                 derivative = (error - previousError)*kd;
                 integral = error+ki;
                 previousError = error;
-                direction = proportional + derivative + integral;
-                driveTrain.drive(max_speed, derivative);
+                direction = (proportional + derivative + integral)/divisor;
+                driveTrain.drive(max_speed, direction);
             }
-            while (this.odometry.getY() < ticks){
-                error = (target - this.imu.getYaw());
+            while (odometry.getY() < ticks){
+                error = (target - imu.getRobotYawPitchRollAngles().getYaw());
                 proportional = error*kp;
                 derivative = (error - previousError)*kd;
                 integral = error+ki;
                 previousError = error;
-                direction = proportional + derivative + integral;
-                speed = a*(Math.abs(this.odometry.getY())-ticks) + b;
-                driveTrain.drive(speed, derivative);
+                direction = (proportional + derivative + integral)/divisor;
+                speed = a*(this.odometry.getY()-ticks*0.7) + b;
+                driveTrain.drive(speed, direction);
             }
+            driveTrain.stop();
         }else{
-            while (this.odometry.getY() > -ticks*0.7) {
-                error = (this.imu.getYaw() - target);
+            while (odometry.getY() > -ticks*0.7) {
+                error = (imu.getRobotYawPitchRollAngles().getYaw() - target);
                 proportional = error * kp;
                 derivative = (error - previousError) * kd;
                 integral = error + ki;
                 previousError = error;
-                direction = proportional + derivative + integral;
-                driveTrain.drive(max_speed, derivative);
+                direction = (proportional + derivative + integral)/divisor;
+                driveTrain.drive(max_speed, direction);
             }
-            while (this.odometry.getY() > -ticks) {
-                error = (this.imu.getYaw()- target);
+            while (odometry.getY() > -ticks) {
+                error = (imu.getRobotYawPitchRollAngles().getYaw()- target);
                 proportional = error * kp;
                 derivative = (error - previousError) * kd;
                 integral = error + ki;
                 previousError = error;
-                direction = proportional + derivative + integral;
-                speed = a * (Math.abs(this.odometry.getY()) - ticks) + b;
-                driveTrain.drive(speed, derivative);
+                direction = (proportional + derivative + integral)/divisor;
+                speed = a * (this.odometry.getY() - (ticks*0.7)) + b;
+                driveTrain.drive(speed, direction);
             }
+            driveTrain.stop();
         }
     }
-
-    public void update(double x, double y, double theta){
-        this.x = x;
-        this.y = y;
-        this.theta = theta;
+    public void parar(){
+        driveTrain.stop();
     }
+
+
 
 }
