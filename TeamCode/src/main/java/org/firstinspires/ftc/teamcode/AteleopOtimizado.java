@@ -129,7 +129,6 @@ public class AteleopOtimizado extends LinearOpMode {
             telemetry.update();
         }
     }
-
     private double getYaw() {
         return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
     }
