@@ -48,7 +48,7 @@ public class Auto extends LinearOpMode{
         while(opModeIsActive()){
             telemetria.start();
             peach.imu.resetYaw();
-            peach.mecanumDrive.MRUVY(0.2, 0.6, 100, 0);
+            peach.mecanumDrive.MRUVX(0.2, 0.6, 100, 0);
             break;
         }
     }

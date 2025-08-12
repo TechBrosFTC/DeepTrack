@@ -41,10 +41,15 @@ public class MecanumDrive {//Class mecanum drive
     public void turn(double target, double max_speed, double min_speed){
         
     }
+    /***
+     Use power positivo para frente e power negativo para trás.
+     @param distance Distance must be in centimeters
+     @param theta_target This is the angle target that you want to follow during the move
+     * */
     public void MRUVY(double min_speed, double max_speed, double distance, double theta_target){
         int ticks = (int) (distance / DriveConstants.CM_PER_TICK);
         double a = Math.abs(max_speed - min_speed)/(ticks*0.3);
-        double b = Math.abs(min_speed);
+        double b = Math.abs(max_speed);
         odometry.resetY();
         if (min_speed > 0) {
             while (odometry.getY() < ticks*0.7){
@@ -63,7 +68,7 @@ public class MecanumDrive {//Class mecanum drive
                 integral = error+ki;
                 previousError = error;
                 direction = (proportional + derivative + integral)/divisor;
-                speed = a*(this.odometry.getY()-ticks*0.7) + b;
+                speed = a*(this.odometry.getY()-(ticks*0.7)) + b;
                 driveTrain.drive(speed, direction);
             }
             driveTrain.stop();
@@ -86,6 +91,59 @@ public class MecanumDrive {//Class mecanum drive
                 direction = (proportional + derivative + integral)/divisor;
                 speed = a * (this.odometry.getY() - (ticks*0.7)) + b;
                 driveTrain.drive(speed, direction);
+            }
+            driveTrain.stop();
+        }
+    }
+    /***
+     Use power positivo para esquerda e power negativo para direita
+     @param distance Distance must be in centimeters
+     @param theta_target This is the angle target that you want to follow during the move
+     */
+    public void MRUVX(double min_speed, double max_speed, double distance,double theta_target){
+        int ticks = (int) (distance / DriveConstants.CM_PER_TICK);
+        double a = Math.abs(max_speed - min_speed)/(ticks*0.3);
+        double b = Math.abs(max_speed);
+        odometry.resetX();
+        if(min_speed > 0){//se maior que vai para a esquerda, se menor que zero pra direita
+            while (odometry.getX() > -ticks*0.7) {
+                error = (imu.getRobotYawPitchRollAngles().getYaw() - target);
+                proportional = error * kp;
+                derivative = (error - previousError) * kd;
+                integral = error + ki;
+                previousError = error;
+                direction = (proportional + derivative + integral)/divisor;
+                driveTrain.left(max_speed, direction);
+            }
+            while (odometry.getX() > -ticks) {
+                error = (imu.getRobotYawPitchRollAngles().getYaw()- target);
+                proportional = error * kp;
+                derivative = (error - previousError) * kd;
+                integral = error + ki;
+                previousError = error;
+                direction = (proportional + derivative + integral)/divisor;
+                speed = a * (this.odometry.getX() - (ticks*0.7)) + b;
+                driveTrain.left(speed, direction);
+            }
+        }else{
+            while (odometry.getX() > -ticks*0.7) {
+                error = (imu.getRobotYawPitchRollAngles().getYaw() - target);
+                proportional = error * kp;
+                derivative = (error - previousError) * kd;
+                integral = error + ki;
+                previousError = error;
+                direction = (proportional + derivative + integral)/divisor;
+                driveTrain.right(max_speed*-1, direction);
+            }
+            while (odometry.getX() > -ticks) {
+                error = (imu.getRobotYawPitchRollAngles().getYaw()- target);
+                proportional = error * kp;
+                derivative = (error - previousError) * kd;
+                integral = error + ki;
+                previousError = error;
+                direction = (proportional + derivative + integral)/divisor;
+                speed = a * (this.odometry.getX() - (ticks*0.7)) + b;
+                driveTrain.right(speed*-1, direction);
             }
             driveTrain.stop();
         }

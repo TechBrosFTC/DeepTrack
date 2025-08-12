@@ -21,7 +21,18 @@ public class DriveTrain {
         rightFront.setPower(power - steering);
         rightBack.setPower(power - steering);
     }
-
+    public void right(double power, double steering){
+        leftFront.setPower((power + steering)*-1);
+        leftBack.setPower((power - steering));
+        rightFront.setPower((power + steering));
+        rightBack.setPower((power - steering)*-1);
+    }
+    public void left(double power, double steering){
+        leftFront.setPower((power + steering));
+        leftBack.setPower((power - steering)*-1);
+        rightFront.setPower((power + steering)*-1);
+        rightBack.setPower((power - steering));
+    }
     public void turn(double power) { //positive = right, negative = left
         leftFront.setPower(power);
         leftBack.setPower(power);
