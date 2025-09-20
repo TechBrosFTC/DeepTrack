@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.deeptrack;
 
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 public class Odometry {
     public double x;
@@ -10,7 +12,8 @@ public class Odometry {
     private Encoder par1;
     private Encoder par2;
     private Encoder perp;
-    public Odometry(double initial_x, double initial_y, double initial_theta, Encoder par1, Encoder par2, Encoder perp){
+
+    public Odometry(double initial_x, double initial_y, double initial_theta, DcMotorEx par1, DcMotorEx par2, DcMotorEx perp) {
         x = initial_x;
         y = initial_y;
         theta = initial_theta;
@@ -19,7 +22,7 @@ public class Odometry {
         this.perp = perp;
         odometryType = 0;
     }
-    public Odometry(double initial_x, double initial_y, double initial_theta, Encoder par1, Encoder perp){
+    public Odometry(double initial_x, double initial_y, double initial_theta, DcMotorEx par1, DcMotorEx perp){
         x = initial_x;
         y = initial_y;
         theta = initial_theta;
@@ -30,6 +33,8 @@ public class Odometry {
     }
     public void resetX(){
         perp.resetEncoder();
+        perp.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        perp.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         x = 0;
     }
     public void resetY(){
@@ -40,6 +45,14 @@ public class Odometry {
                 break;
             case 1:
                 par1.resetEncoder();
+                par1.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+                par1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+                par2.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+                par2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                break;
+            case 1:
+                par1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                par1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 break;
         }
     }
@@ -51,6 +64,10 @@ public class Odometry {
                 break;
             case 1:
                 value = par1.getEncoder();
+                value = Math.round((par2.getCurrentPosition()+ par1.getCurrentPosition()) / 2);
+                break;
+            case 1:
+                value = par1.getCurrentPosition();
                 break;
             default:
                 value = 0;
@@ -60,5 +77,6 @@ public class Odometry {
     }
     public double getX() {
         return perp.getEncoder();
+        return perp.getCurrentPosition();
     }
 }
