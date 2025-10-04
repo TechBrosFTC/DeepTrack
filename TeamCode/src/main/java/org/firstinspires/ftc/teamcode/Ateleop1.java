@@ -1,17 +1,27 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.webkit.WebHistoryItem;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.Servo;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.deeptrack.Armazenamento;
 
 @TeleOp (name = "Ateleop1")
 public class Ateleop1 extends LinearOpMode {
     private IMU imu;
-    private DcMotorEx direitaFrente, direitaTras, esquerdaFrente, esquerdaTras;//instancia dos motores
+    private DcMotorEx direitaFrente, direitaTras, esquerdaFrente, esquerdaTras;//instancia dos motores de movimento
+    private DcMotorEx sugador, esteira, encoderseletor;//instância dos motores do intake
+    private DcMotorEx atirador1, atirador2;//instancia dos motores do outtake
+    private Servo cremalheira, seletor;
+    private Armazenamento armazenamento = new Armazenamento();
+    double powersugador = 0.8, poweresteira = 0.8;
     double power = 1, curvapower = 0.4, multiplicadorx = 1, multiplicador = 0.6, multiplicadorcurva = 1;//variáveis de movimentação
     double proporcional, derivativa, integral, erro, direcao = 0, ultimoerro = 0, alvo = 0; //Variáveis de cáluclo do PID
     boolean curva = false, andando = false;//Controle de movimento
@@ -19,38 +29,85 @@ public class Ateleop1 extends LinearOpMode {
     double lastpower = 0; //controle de movimento
     float f,t,d,e;//Direções do joystick
     boolean modolento = false;//controle de movimento
+
+
     ///////////////////////////////////////////////////////////////////////
 
     public void runOpMode() throws InterruptedException {
         imu = hardwareMap.get(IMU.class, "imu");
+
+
         direitaFrente = hardwareMap.get(DcMotorEx.class, "rightFront");
         direitaTras = hardwareMap.get(DcMotorEx.class, "rightBack");
-        esquerdaFrente = hardwareMap.get(DcMotorEx.class, "leftFront");
+        esquerdaFrente = hardwareMap.get(DcMotorEx.class, "encoderseletor");
         esquerdaTras = hardwareMap.get(DcMotorEx.class, "leftBack");
-        RevHubOrientationOnRobot revOrientaion = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.LEFT, RevHubOrientationOnRobot.UsbFacingDirection.UP);
+
+
+        sugador = hardwareMap.get(DcMotorEx.class, "par");
+        esteira = hardwareMap.get(DcMotorEx.class, "perp");
+        encoderseletor = hardwareMap.get(DcMotorEx.class, "encoderseletor");
+
+        atirador1 = hardwareMap.get(DcMotorEx.class, "atirador1");
+        atirador2 = hardwareMap.get(DcMotorEx.class, "atirador2");
+
+        cremalheira = hardwareMap.get(Servo.class, "cremalheira");
+        seletor = hardwareMap.get(Servo.class, "seletor");
+
+        RevHubOrientationOnRobot revOrientaion = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, RevHubOrientationOnRobot.UsbFacingDirection.UP);
         imu.initialize(new IMU.Parameters(revOrientaion));
+
         direitaFrente.setDirection(DcMotorSimple.Direction.REVERSE);
-        direitaTras.setDirection(DcMotorSimple.Direction.FORWARD);
-        esquerdaTras.setDirection(DcMotorSimple.Direction.FORWARD);
-        esquerdaFrente.setDirection(DcMotorSimple.Direction.FORWARD);
-        imu.resetYaw();
-        Thread telemetria = new Thread(() -> {
-            while (opModeIsActive()) {
-///////////////////////////////////////////////////Telemetria/////////////////////////////////////////////////////////////////////
-                telemetry.addData("giro", gyro());
-                telemetry.addData("direcao:", direcao);
-                telemetry.addData("controle y:", gamepad1.left_stick_y);
-                telemetry.addData("controle x:", gamepad1.left_stick_x);
-                telemetry.addData("power:", power);
-                telemetry.addData("modolento", modolento);
-                telemetry.update();
-            }
-        });//Thread telemetria
+        direitaTras.setDirection(DcMotorSimple.Direction.REVERSE);
+        esquerdaFrente.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        sugador.setDirection(DcMotorSimple.Direction.REVERSE);
+        esteira.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        imu.resetYaw();
         waitForStart();
-
+        Thread garra = new Thread(() -> { // Thread do gamepad 2
+            while (opModeIsActive()){
+                if(gamepad2.a){
+                    sugador.setPower(powersugador);
+                    esteira.setPower(poweresteira);
+                }else{
+                    sugador.setPower(0);
+                    esteira.setPower(0);
+                }
+                if(gamepad2.right_trigger > 0){
+                    atirador1.setPower(1);
+                    atirador2.setPower(-1);
+                }else if(gamepad2.left_trigger > 0){
+                    atirador1.setPower(-1);
+                    atirador2.setPower(1);
+                }else{
+                    atirador1.setPower(0);
+                    atirador2.setPower(0);
+                }
+                if(gamepad2.x) {
+                    cremalheira.setPosition(1);
+                    sleep(700);
+                    cremalheira.setPosition(0.5);
+                }else if (gamepad2.y) {
+                    cremalheira.setPosition(0);
+                    sleep(700);
+                    cremalheira.setPosition(0.5);
+                }
+                if(gamepad2.right_bumper){
+                    seletor.setPosition(1);
+                    sleep(50);
+                } else if (gamepad2.left_bumper) {
+                    seletor.setPosition(0);
+                    sleep(50);
+                }else{
+                    seletor.setPosition(0.5);
+                }
+            }
+        });
         imu.resetYaw();
-        telemetria.start();
+
+        garra.start();
+
         while (opModeIsActive()) {
             if (gamepad1.left_stick_y != 0) {
                 if (gamepad1.left_stick_y > 0) {
@@ -113,7 +170,7 @@ public class Ateleop1 extends LinearOpMode {
                 derivativa = (erro - ultimoerro) * 1;
                 integral = erro + ki;
                 direcao = (proporcional + derivativa + integral) / 100;
-                mecanumdireitabase(Math.abs(gamepad1.left_stick_x), -direcao);
+                mecanumdireitabase(Math.abs(gamepad1.left_stick_x)*multiplicador, -direcao);
                 andando = true;
             }
             if (e > f && e > t && e > d) { //andar para Esquerda
@@ -125,7 +182,7 @@ public class Ateleop1 extends LinearOpMode {
                 derivativa = (erro - ultimoerro) * 1;
                 integral = erro + ki;
                 direcao = (proporcional + derivativa + integral) / 100;
-                mecanumesquerdabase(Math.abs(gamepad1.left_stick_x), direcao);
+                mecanumesquerdabase(Math.abs(gamepad1.left_stick_x)*multiplicador, direcao);
                 andando = true;
             }
             if (f == 0 && t == 0 && d == 0 && e == 0) {
