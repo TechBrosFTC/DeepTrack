@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 import static java.lang.Thread.sleep;
 
+import android.util.JsonReader;
+
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.LLStatus;
@@ -9,6 +11,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+
+import java.util.List;
 
 @Autonomous (name = "testeLL")
 
@@ -34,9 +40,16 @@ public class TesteLL extends LinearOpMode {
             LLResult result = limelight.getLatestResult();
 
             double tx = Math.round(result.getTx()); // How far left or right the target is (degrees)
-            double ty = result.getTy(); // How far up or down the target is (degrees)
+            double ty = result.getTy(); // How far up or down the target is (degrees);
             double ta = result.getTa(); // How big the target looks (0%-100% of the image)
-            position = txToServoPos(tx) + 0.1;
+            List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
+            for (LLResultTypes.FiducialResult fiducial : fiducials) {
+                int id = fiducial.getFiducialId(); // The ID number of the fiducial
+                double x = fiducial.getTargetXDegrees(); // Where it is (left-right)
+                double y = fiducial.getTargetYDegrees(); // Where it is (up-down)
+                double StrafeDistance_3D = fiducial.getRobotPoseTargetSpace().getPosition().y;
+                telemetry.addData("Fiducial " + id, "is " + StrafeDistance_3D + " meters away");
+            }
             telemetry.addData("Target X", tx);
             telemetry.addData("Target Y", ty);
             telemetry.addData("Target Area", ta);

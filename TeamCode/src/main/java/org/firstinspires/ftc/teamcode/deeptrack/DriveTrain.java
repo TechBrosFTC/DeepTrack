@@ -33,11 +33,11 @@ public class DriveTrain {
         rightFront.setPower((power + steering)*-1);
         rightBack.setPower((power - steering));
     }
-    public void turn(double power) { //positive = right, negative = left
-        leftFront.setPower(power);
-        leftBack.setPower(power);
-        rightFront.setPower(-power);
-        rightBack.setPower(-power);
+    public void turn(double power) { //segue o ciclo trigonometrico
+        leftFront.setPower(-power);
+        leftBack.setPower(-power);
+        rightFront.setPower(power);
+        rightBack.setPower(power);
     }
 
     public void stop() {

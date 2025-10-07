@@ -2,6 +2,9 @@ package org.firstinspires.ftc.teamcode;
 
 import android.webkit.WebHistoryItem;
 
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -13,14 +16,17 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.deeptrack.Armazenamento;
 
+import java.util.List;
+
 @TeleOp (name = "Ateleop1")
 public class Ateleop1 extends LinearOpMode {
     private IMU imu;
     private DcMotorEx direitaFrente, direitaTras, esquerdaFrente, esquerdaTras;//instancia dos motores de movimento
     private DcMotorEx sugador, esteira, encoderseletor;//instância dos motores do intake
     private DcMotorEx atirador1, atirador2;//instancia dos motores do outtake
-    private Servo cremalheira, seletor;
-    private Armazenamento armazenamento = new Armazenamento();
+    private Servo cremalheira, seletor;//
+    private Limelight3A limelight; //instancia da camera
+    private Armazenamento armazenamento = new Armazenamento();//
     double powersugador = 0.8, poweresteira = 0.8;
     double power = 1, curvapower = 0.4, multiplicadorx = 1, multiplicador = 0.6, multiplicadorcurva = 1;//variáveis de movimentação
     double proporcional, derivativa, integral, erro, direcao = 0, ultimoerro = 0, alvo = 0; //Variáveis de cáluclo do PID
@@ -29,6 +35,7 @@ public class Ateleop1 extends LinearOpMode {
     double lastpower = 0; //controle de movimento
     float f,t,d,e;//Direções do joystick
     boolean modolento = false;//controle de movimento
+
 
 
     ///////////////////////////////////////////////////////////////////////
@@ -52,6 +59,8 @@ public class Ateleop1 extends LinearOpMode {
 
         cremalheira = hardwareMap.get(Servo.class, "cremalheira");
         seletor = hardwareMap.get(Servo.class, "seletor");
+
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
 
         RevHubOrientationOnRobot revOrientaion = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, RevHubOrientationOnRobot.UsbFacingDirection.UP);
         imu.initialize(new IMU.Parameters(revOrientaion));
@@ -107,6 +116,11 @@ public class Ateleop1 extends LinearOpMode {
         imu.resetYaw();
 
         garra.start();
+
+        limelight.setPollRateHz(90);
+        //0 = identificação do motif pattern, 1 = identificação do goal vermelho, 2 = identificação do goal azul
+        limelight.pipelineSwitch(1);
+        limelight.start();
 
         while (opModeIsActive()) {
             if (gamepad1.left_stick_y != 0) {
@@ -222,6 +236,25 @@ public class Ateleop1 extends LinearOpMode {
                 multiplicadorcurva = 1;
                 modolento = false;
                 sleep(100);
+            }
+            if(gamepad1.dpad_up){
+                LLResult result = limelight.getLatestResult();
+                if(result.isValid()){
+                    double x = 0;
+                    double y;
+                    int id;
+                    List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
+                    for (LLResultTypes.FiducialResult fiducial : fiducials) {
+                        id = fiducial.getFiducialId(); // The ID number of the fiducial
+                        x = fiducial.getTargetXDegrees(); // Where it is (left-right)
+                        y = fiducial.getTargetYDegrees(); // Where it is (up-down)
+                    }
+                    if(Math.abs(x) > 2){
+                        if(x > 0){
+
+                        }
+                    }
+                }
             }
         }
     }

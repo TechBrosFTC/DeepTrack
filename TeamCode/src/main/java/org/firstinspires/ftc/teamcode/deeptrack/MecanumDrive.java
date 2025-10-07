@@ -148,6 +148,28 @@ public class MecanumDrive {//Class mecanum drive
             driveTrain.stop();
         }
     }
+    /**
+     * @param target target in deegres, following the trigonometric cicle.
+     * */
+    public void curve(double target, double min_speed, double max_speed){
+        double a = Math.abs(max_speed - min_speed)/(target*0.3);
+        double b = Math.abs(max_speed);
+        double sentido;
+        imu.resetYaw();
+        if(target > 0){
+            sentido = 1;
+        }else{
+            sentido = -1;
+        }
+        while (Math.abs(imu.getRobotYawPitchRollAngles().getYaw()) < Math.abs(target)){
+            double speed = a*imu.getRobotYawPitchRollAngles().getYaw() + b;
+            if(speed < min_speed){
+                speed = min_speed;
+            }
+            driveTrain.turn(speed*sentido);
+        }
+        driveTrain.stop();
+    }
     public void parar(){
         driveTrain.stop();
     }
