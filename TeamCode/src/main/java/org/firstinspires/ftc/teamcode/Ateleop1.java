@@ -35,6 +35,7 @@ public class Ateleop1 extends LinearOpMode {
     double lastpower = 0; //controle de movimento
     float f,t,d,e;//Direções do joystick
     boolean modolento = false;//controle de movimento
+    RobotSetup peach;
 
 
 
@@ -62,6 +63,7 @@ public class Ateleop1 extends LinearOpMode {
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
 
+        peach = new RobotSetup(hardwareMap, esquerdaFrente, esquerdaTras, direitaFrente, direitaTras, sugador, esteira);
         RevHubOrientationOnRobot revOrientaion = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, RevHubOrientationOnRobot.UsbFacingDirection.UP);
         imu.initialize(new IMU.Parameters(revOrientaion));
 
@@ -74,48 +76,9 @@ public class Ateleop1 extends LinearOpMode {
 
         imu.resetYaw();
         waitForStart();
-        Thread garra = new Thread(() -> { // Thread do gamepad 2
-            while (opModeIsActive()){
-                if(gamepad2.a){
-                    sugador.setPower(powersugador);
-                    esteira.setPower(poweresteira);
-                }else{
-                    sugador.setPower(0);
-                    esteira.setPower(0);
-                }
-                if(gamepad2.right_trigger > 0){
-                    atirador1.setPower(1);
-                    atirador2.setPower(-1);
-                }else if(gamepad2.left_trigger > 0){
-                    atirador1.setPower(-1);
-                    atirador2.setPower(1);
-                }else{
-                    atirador1.setPower(0);
-                    atirador2.setPower(0);
-                }
-                if(gamepad2.x) {
-                    cremalheira.setPosition(1);
-                    sleep(700);
-                    cremalheira.setPosition(0.5);
-                }else if (gamepad2.y) {
-                    cremalheira.setPosition(0);
-                    sleep(700);
-                    cremalheira.setPosition(0.5);
-                }
-                if(gamepad2.right_bumper){
-                    seletor.setPosition(1);
-                    sleep(50);
-                } else if (gamepad2.left_bumper) {
-                    seletor.setPosition(0);
-                    sleep(50);
-                }else{
-                    seletor.setPosition(0.5);
-                }
-            }
-        });
+
         imu.resetYaw();
 
-        garra.start();
 
         limelight.setPollRateHz(90);
         //0 = identificação do motif pattern, 1 = identificação do goal vermelho, 2 = identificação do goal azul
@@ -237,24 +200,96 @@ public class Ateleop1 extends LinearOpMode {
                 modolento = false;
                 sleep(100);
             }
-            if(gamepad1.dpad_up){
+            if(gamepad1.b){
                 LLResult result = limelight.getLatestResult();
                 if(result.isValid()){
                     double x = 0;
-                    double y;
+                    double y = 0;
                     int id;
                     List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
                     for (LLResultTypes.FiducialResult fiducial : fiducials) {
                         id = fiducial.getFiducialId(); // The ID number of the fiducial
-                        x = fiducial.getTargetXDegrees(); // Where it is (left-right)
+                        x = fiducial.getTargetXDegrees() -3  ; // Where it is (left-right)
                         y = fiducial.getTargetYDegrees(); // Where it is (up-down)
+                        telemetry.addData("x", x);
+                        telemetry.addData("y", y);
+                        telemetry.update();
                     }
-                    if(Math.abs(x) > 2){
-                        if(x > 0){
-
+                    if(y > 8){
+                        x -= -2;
+                        if(Math.abs(x) > 1){
+                            if(x > 0){
+                                peach.mecanumDrive.curve(-x, 0.25, 0.25 );
+                            }else{
+                                peach.mecanumDrive.curve(-x, 0.25, 0.25 );
+                            }
                         }
+                        atirador1.setPower(-0.95);
+                        atirador2.setPower(0.95);
+                        sleep(1000);
+                        cremalheira.setPosition(1);
+                        sleep(450);
+                        cremalheira.setPosition(0);
+                        atirador1.setPower(0);
+                        atirador2.setPower(0);
+                        sleep(500);
+                        cremalheira.setPosition(0.5);
+                    }else{
+                        if(Math.abs(x) > 1){
+                            if(x > 0){
+                                peach.mecanumDrive.curve(-x, 0.25, 0.25 );
+                            }else{
+                                peach.mecanumDrive.curve(-x, 0.25, 0.25 );
+                            }
+                        }
+                        atirador1.setPower(-0.95);
+                        atirador2.setPower(0.95
+                        );
+                        sleep(1600);
+                        cremalheira.setPosition(1);
+                        sleep(450);
+                        cremalheira.setPosition(0);
+                        atirador1.setPower(0);
+                        atirador2.setPower(0);
+                        sleep(500);
+                        cremalheira.setPosition(0.5);
                     }
                 }
+            }
+            if(gamepad2.a){
+                sugador.setPower(powersugador);
+                esteira.setPower(poweresteira);
+            }else{
+                sugador.setPower(0);
+                esteira.setPower(0);
+            }
+            if(gamepad2.right_trigger > 0){
+                atirador1.setPower(1);
+                atirador2.setPower(-1);
+            }else if(gamepad2.left_trigger > 0){
+                atirador1.setPower(-1);
+                atirador2.setPower(1);
+            }else{
+                atirador1.setPower(0);
+                atirador2.setPower(0);
+            }
+            /*if(gamepad2.x) {
+                cremalheira.setPosition(1);
+                sleep(700);
+                cremalheira.setPosition(0.5);
+            }else if (gamepad2.y) {
+                cremalheira.setPosition(0);
+                sleep(700);
+                cremalheira.setPosition(0.5);
+            }*/
+            if(gamepad2.right_bumper){
+                seletor.setPosition(1);
+                sleep(50);
+            } else if (gamepad2.left_bumper) {
+                seletor.setPosition(0);
+                sleep(50);
+            }else{
+                seletor.setPosition(0.5);
             }
         }
     }

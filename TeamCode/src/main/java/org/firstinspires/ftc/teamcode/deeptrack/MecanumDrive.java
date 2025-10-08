@@ -161,8 +161,11 @@ public class MecanumDrive {//Class mecanum drive
         }else{
             sentido = -1;
         }
+        while (Math.abs(imu.getRobotYawPitchRollAngles().getYaw()) < Math.abs(target)*0.7){
+            driveTrain.turn(max_speed*sentido);
+        }
         while (Math.abs(imu.getRobotYawPitchRollAngles().getYaw()) < Math.abs(target)){
-            double speed = a*imu.getRobotYawPitchRollAngles().getYaw() + b;
+            double speed = a*(imu.getRobotYawPitchRollAngles().getYaw()-target*0.7) + b;
             if(speed < min_speed){
                 speed = min_speed;
             }

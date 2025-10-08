@@ -30,7 +30,7 @@ public class TesteLL extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         servo = hardwareMap.get(Servo.class, "servo");
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(0);
+        limelight.pipelineSwitch(1);
         limelight.setPollRateHz(90);
         limelight.start(); // This tells Limelight to start looking!
         servo.setPosition(rest);
